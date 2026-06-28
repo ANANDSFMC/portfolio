@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Anand Kumar B — Interactive 9-Year Salesforce Journey</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --sf-blue:#0070d2;
+  --sf-navy:#032d60;
+  --sf-gold:#ffb75d;
+  --sf-teal:#00a1e0;
+  --sf-green:#4bca81;
+  --sf-red:#c23934;
+  --sf-purple:#7b5ea7;
+  --glass:rgba(255,255,255,0.06);
+  --glass-border:rgba(255,255,255,0.12);
+  --text:#e8f4ff;
+  --text-muted:rgba(232,244,255,0.65);
+  --bg-start:#020c1b;
+  --bg-end:#0a2140;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Inter',sans-serif;
+  background:linear-gradient(135deg,var(--bg-start) 0%,var(--bg-end) 100%);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+#progress-bar{position:fixed;top:0;left:0;height:4px;width:0%;background:linear-gradient(90deg,var(--sf-blue),var(--sf-teal),var(--sf-gold));z-index:9999;transition:width .1s linear;}
+
+/* Gamified XP Rank HUD Tracker */
+#hud-rank-tracker {
+  position: fixed;
+  top: 18px;
+  left: 20px;
+  z-index: 9998;
+  background: rgba(3, 45, 96, 0.85);
+  border: 1px solid var(--sf-teal);
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 20px rgba(0, 161, 224, 0.2);
+  transition: all 0.3s ease;
+}
+#hud-xp-bar {
+  width: 80px;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+#hud-xp-fill {
+  width: 10%;
+  height: 100%;
+  background: var(--sf-gold);
+  transition: width 0.4s ease;
+}
+
+#theme-toggle{position:fixed;top:18px;right:70px;z-index:9998;background:var(--glass);border:1px solid var(--glass-border);border-radius:50%;width:40px;height:40px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);transition:all .3s;}
+#theme-toggle:hover{transform:scale(1.1);background:rgba(255,255,255,0.15);}
+#dot-nav{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:9997;display:flex;flex-direction:column;gap:12px;}
+.dot-nav-item{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.2);cursor:pointer;transition:all .3s;border:1px solid rgba(255,255,255,0.3);}
+.dot-nav-item:hover,.dot-nav-item.active{background:var(--sf-gold);transform:scale(1.4);box-shadow:0 0 10px var(--sf-gold);}
+#stars-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+.page-wrapper{position:relative;z-index:1;}
+section{padding:90px 20px;max-width:1200px;margin:0 auto;}
+.section-label{font-size:.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--sf-gold);margin-bottom:12px;display:block;}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;margin-bottom:16px;}
+.section-desc{color:var(--text-muted);font-size:1.05rem;line-height:1.7;max-width:800px;margin-bottom:48px;}
+
+/* Hero Area */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px 60px;text-align:center;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,112,210,0.15);border:1px solid rgba(0,112,210,0.4);border-radius:20px;padding:6px 18px;font-size:.75rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--sf-teal);margin-bottom:24px;}
+.avatar{width:130px;height:130px;border-radius:50%;background:linear-gradient(135deg,var(--sf-blue),var(--sf-teal));display:flex;align-items:center;justify-content:center;font-size:3.5rem;font-weight:900;margin:0 auto 24px;box-shadow:0 0 50px rgba(0,112,210,.4);cursor:pointer;transition:transform .3s;animation:avatar-float 4s ease-in-out infinite;}
+@keyframes avatar-float{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.8rem,7vw,5rem);font-weight:900;background:linear-gradient(135deg,#fff 30%,var(--sf-gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;letter-spacing:-1px;}
+.hero-title{font-size:clamp(1.2rem,2.5vw,1.5rem);color:var(--sf-teal);font-weight:600;margin-bottom:8px;}
+.hero-subtitle{font-size:1rem;color:var(--text-muted);margin-bottom:40px;max-width:600px;line-height:1.6;}
+.hero-stats{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:32px;}
+.stat-pill{background:var(--glass);border:1px solid var(--glass-border);border-radius:24px;padding:10px 22px;font-size:.85rem;font-weight:600;backdrop-filter:blur(10px);transition:all .3s;}
+.stat-pill strong{color:var(--sf-gold);font-weight:700;}
+.stat-pill:hover{background:rgba(0,112,210,.2);border-color:var(--sf-blue);transform:translateY(-3px);}
+
+/* Marquee Banner */
+.marquee-section{padding:24px 0;overflow:hidden;border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);background:rgba(255,255,255,0.01);}
+.marquee-track{display:flex;gap:40px;animation:marquee 35s linear infinite;white-space:nowrap;}
+.marquee-item{font-size:.8rem;font-weight:700;color:var(--sf-teal);letter-spacing:1.5px;text-transform:uppercase;opacity:.85;}
+@keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+/* Dashboard KPI Blocks */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:48px;}
+.kpi-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:18px;padding:28px 24px;text-align:center;backdrop-filter:blur(12px);transition:all .4s cubic-bezier(0.16, 1, 0.3, 1);position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--sf-blue);opacity:0;transition:opacity .3s;}
+.kpi-card:hover::before{opacity:1;}
+.kpi-card:hover{transform:translateY(-5px);border-color:rgba(0,112,210,0.4);box-shadow:0 12px 30px rgba(0,112,210,0.15);}
+.kpi-value{font-size:2.4rem;font-weight:800;color:var(--sf-gold);display:block;margin-bottom:6px;letter-spacing:-1px;transition:all 0.3s ease;}
+.kpi-label{font-size:.8rem;color:var(--text);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.kpi-subtext{font-size:.72rem;color:var(--text-muted);line-height:1.4;}
+
+/* Data Tables */
+.table-wrapper{background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;padding:24px;overflow-x:auto;backdrop-filter:blur(12px);margin-bottom:40px;}
+table{width:100%;border-collapse:collapse;text-align:left;}
+th{padding:16px;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--sf-teal);border-bottom:2px solid var(--glass-border);font-weight:700;}
+td{padding:16px;font-size:.9rem;line-height:1.5;border-bottom:1px solid rgba(255,255,255,0.05);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+
+/* Timelines */
+.timeline{position:relative;padding-left:45px;max-width:900px;margin:0 auto;}
+.timeline::before{content:'';position:absolute;left:15px;top:5px;bottom:5px;width:2px;background:linear-gradient(to bottom,var(--sf-blue) 0%,var(--sf-teal) 50%,var(--sf-gold) 100%);}
+.timeline-item{position:relative;margin-bottom:50px;}
+.timeline-dot{position:absolute;left:-43px;top:2px;width:24px;height:24px;border-radius:50%;background:var(--bg-end);border:3px solid var(--sf-blue);display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .3s;z-index:2;}
+.timeline-item:hover .timeline-dot{transform:scale(1.25);border-color:var(--sf-gold);box-shadow:0 0 12px var(--sf-gold);}
+.timeline-year{font-size:.78rem;font-weight:800;color:var(--sf-gold);margin-bottom:6px;letter-spacing:1px;}
+.timeline-title{font-size:1.15rem;font-weight:700;margin-bottom:8px;color:#fff;}
+.timeline-desc{font-size:.92rem;color:var(--text-muted);line-height:1.6;margin-bottom:10px;}
+
+/* General Grid Frameworks */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;}
+.card{background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;padding:32px 28px;backdrop-filter:blur(12px);transition:all .3s;display:flex;flex-direction:column;justify-content:between;}
+.card:hover{transform:translateY(-6px);border-color:rgba(0,112,210,0.4);box-shadow:0 16px 40px rgba(0,112,210,0.15);}
+.card-icon{font-size:2.2rem;margin-bottom:20px;display:block;}
+.card h3{font-size:1.2rem;font-weight:700;margin-bottom:12px;color:#fff;}
+.card p{font-size:.92rem;color:var(--text-muted);line-height:1.65;flex-grow:1;}
+.card-footer{margin-top:20px;display:flex;justify-content:space-between;align-items:center;}
+.card-tag{padding:4px 12px;border-radius:12px;font-size:.72rem;font-weight:700;background:rgba(0,112,210,0.15);color:var(--sf-teal);text-transform:uppercase;letter-spacing:0.5px;}
+
+/* Interactive Simulator */
+.sim-container {background:rgba(194, 57, 52, 0.04);border:1px dashed rgba(194, 57, 52, 0.4);border-radius:24px;padding:32px;margin-bottom:48px;}
+.sim-btn {background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:12px;padding:12px 20px;font-size:0.88rem;color:var(--text);cursor:pointer;transition:all 0.2s ease;text-align:left;width:100%;margin-bottom:10px;font-family:'Inter', sans-serif;}
+.sim-btn:hover {background:var(--sf-blue);border-color:var(--sf-blue);transform:translateX(5px);}
+
+/* Interactive Slack Bot Console */
+.slack-console {font-family:'Fira Code', monospace;background:#010a15;border:1px solid #112a4a;border-radius:20px;padding:24px;margin-top:24px;box-shadow:inset 0 0 20px rgba(0,0,0,0.6);}
+.slack-tabs {display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:10px;overflow-x:auto;}
+.slack-tab {background:none;border:none;color:var(--text-muted);font-size:0.75rem;cursor:pointer;padding:6px 14px;border-radius:6px;transition:all 0.2s;white-space:nowrap;}
+.slack-tab.active {background:rgba(0, 161, 224, 0.2);color:var(--sf-teal);font-weight:600;}
+.slack-output {font-size:0.85rem;line-height:1.6;color:#8ab4f8;min-height:160px;}
+
+/* Filter Systems */
+.filter-bar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:36px;}
+.filter-btn{background:var(--glass);border:1px solid var(--glass-border);border-radius:24px;padding:8px 22px;font-size:.82rem;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all .3s;backdrop-filter:blur(10px);}
+.filter-btn:hover,.filter-btn.active{background:var(--sf-blue);border-color:var(--sf-blue);color:#fff;box-shadow:0 4px 15px rgba(0,112,210,0.3);}
+
+/* Quote Systems */
+.quote-wall{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;}
+.quote-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;padding:28px;backdrop-filter:blur(10px);transition:all .3s;position:relative;}
+.quote-card:hover{transform:translateY(-4px);border-color:rgba(255,183,93,.35);}
+.quote-card blockquote{font-size:.95rem;color:var(--text);line-height:1.7;font-style:italic;margin-bottom:20px;padding-left:16px;border-left:3px solid var(--sf-gold);}
+.quote-author{font-size:.82rem;font-weight:700;color:var(--sf-teal);letter-spacing:0.5px;}
+.quote-context{font-size:0.7rem;color:var(--text-muted);margin-top:2px;text-transform:uppercase;}
+.copy-btn{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.04);border:1px solid var(--glass-border);border-radius:8px;padding:4px 10px;font-size:.7rem;cursor:pointer;color:var(--text-muted);transition:all .2s;font-weight:500;}
+.copy-btn:hover{background:rgba(0,112,210,.25);color:var(--sf-teal);border-color:var(--sf-blue);}
+
+/* Countdown Cluster */
+.countdown-box{display:inline-flex;gap:24px;background:rgba(255,183,93,.08);border:1px solid rgba(255,183,93,.25);border-radius:20px;padding:24px 36px;margin-top:20px;backdrop-filter:blur(10px);}
+.countdown-unit{text-align:center;}
+.countdown-number{font-size:2.2rem;font-weight:900;color:var(--sf-gold);display:block;letter-spacing:-1px;}
+.countdown-label{font-size:.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-top:2px;}
+
+/* Letter Architecture */
+.letter{background:var(--glass);border:1px solid var(--glass-border);border-radius:28px;padding:56px;backdrop-filter:blur(12px);max-width:850px;margin:0 auto;box-shadow:0 20px 50px rgba(0,0,0,0.3);}
+.letter p{font-size:1.02rem;line-height:1.85;color:var(--text-muted);margin-bottom:24px;font-weight:400;}
+.letter p strong{color:#fff;}
+.letter-sign{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--sf-gold);font-weight:700;margin-top:32px;}
+
+/* Tag Definitions */
+.tag{display:inline-block;padding:3px 12px;border-radius:12px;font-size:.68rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.tag-milestone{background:rgba(0,112,210,.18);color:var(--sf-teal);}
+.tag-promotion{background:rgba(75,202,129,.18);color:var(--sf-green);}
+.tag-award{background:rgba(255,183,93,.18);color:var(--sf-gold);}
+.tag-leadership{background:rgba(123,94,167,.18);color:var(--sf-purple);}
+
+/* Theme Configurations */
+[data-theme="light"]{
+  --bg-start:#f4f7fc;
+  --bg-end:#e3ecf8;
+  --text:#032d60;
+  --text-muted:#475d74;
+  --glass:rgba(255,255,255,.7);
+  --glass-border:rgba(0,112,210,.18);
+}
+[data-theme="light"] body{background:linear-gradient(135deg,#f4f7fc 0%,#e3ecf8 100%);}
+[data-theme="light"] #stars-canvas{opacity:.08;}
+[data-theme="light"] .timeline-title, [data-theme="light"] .card h3, [data-theme="light"] .letter p strong{color:#032d60;}
+
+@media(max-width:768px){
+  section{padding:60px 16px;}
+  .countdown-box{gap:14px;padding:16px 24px;width:100%;justify-content:center;}
+  .timeline{padding-left:30px;}
+  .timeline-dot{left:-31px;}
+  .letter{padding:32px 24px;}
+  #theme-toggle{top:12px;right:12px;}
+  #dot-nav{display:none;}
+  #hud-rank-tracker {display:none;}
+}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+
+<div id="hud-rank-tracker">
+  <span>Rank: <strong id="hud-rank-text" style="color:var(--sf-gold);">Core Solver</strong></span>
+  <div id="hud-xp-bar"><div id="hud-xp-fill"></div></div>
+</div>
+
+<button id="theme-toggle" title="Toggle System Theme">🌙</button>
+
+<nav id="dot-nav">
+  <div class="dot-nav-item active" data-target="hero" title="Home Frame"></div>
+  <div class="dot-nav-item" data-target="kpi-dashboard" title="KPI Performance Analytics"></div>
+  <div class="dot-nav-item" data-target="crisis-sandbox" title="Incident Crisis Sandbox"></div>
+  <div class="dot-nav-item" data-target="timeline-journey" title="9-Year Milestone Mapping"></div>
+  <div class="dot-nav-item" data-target="account-management" title="Critical Accounts Shield"></div>
+  <div class="dot-nav-item" data-target="ai-infrastructure" title="Slackbot Automation & AI"></div>
+  <div class="dot-nav-item" data-target="people-workforce" title="Workforce Up-skilling Matrix"></div>
+  <div class="dot-nav-item" data-target="peer-recognition" title="Corporate Accolades & Badges"></div>
+  <div class="dot-nav-item" data-target="personal-letter" title="Executive Reflector Note"></div>
+</nav>
+
+<canvas id="stars-canvas"></canvas>
+<div class="page-wrapper">
+
+<section id="hero" class="hero" style="max-width:100%; padding-top:40px;">
+  <div class="hero-badge">⭐ The 9-Year Signature Support Legacy</div>
+  <div class="avatar" id="avatar-btn">A</div>
+  <h1>Anand Kumar B</h1>
+  <div class="hero-title">Manager, Technical Support Engineering</div>
+  <div class="hero-subtitle">Marketing Cloud Engagement &amp; Signature Success · EMEA Ecosystem · Salesforce</div>
+  
+  <div class="hero-stats">
+    <div class="stat-pill">🏆 Global Team CSAT <strong id="hero-csat-val">4.85</strong></div>
+    <div class="stat-pill">🚨 SLO Adherence <strong id="hero-slo-val">99.79%</strong></div>
+    <div class="stat-pill">🔒 Contract Renewal <strong>$1.72M</strong></div>
+    <div class="stat-pill">👥 Pod Leadership <strong>8 Engineers</strong></div>
+    <div class="stat-pill">🌍 Accounts Covered <strong>2,937 EMEA</strong></div>
+  </div>
+</section>
+
+<div class="marquee-section" style="max-width:100%;">
+  <div class="marquee-track">
+    <span class="marquee-item">Marketing Cloud Engagement (MCE)</span><span class="marquee-item">•</span>
+    <span class="marquee-item">Signature Success Architecture</span><span class="marquee-item">•</span>
+    <span class="marquee-item">Sev1 Support Incident Command</span><span class="marquee-item">•</span>
+    <span class="marquee-item">Agentforce Core Specialist</span><span class="marquee-item">•</span>
+    <span class="marquee-item">Red Account Stabilization Shield</span><span class="marquee-item">•</span>
+    <span class="marquee-item">Cross-Cloud Data Systems Integration</span><span class="marquee-item">•</span>
+    <span class="marquee-item">Global Backlog Volume Reduction Indicator</span><span class="marquee-item">•</span>
+  </div>
+</div>
+
+<section id="kpi-dashboard">
+  <div class="section-label">Operations Terminal</div>
+  <div class="section-title">KPI Excellence &amp; Backlog Matrix</div>
+  <div class="section-desc">Audited verification records across FY26 and FY27 Q1 illustrating a sustained history of executive-tier delivery in global Marketing Cloud Support loops.</div>
+  
+  <div class="filter-bar" style="justify-content: center; margin-bottom: 40px;">
+    <button class="filter-btn active" id="btn-view-exec" onclick="toggleMetricView('exec')">📊 View Executive Impact Metrics</button>
+    <button class="filter-btn" id="btn-view-eng" onclick="toggleMetricView('eng')">🔧 View Engineering Delivery Metrics</button>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="kpi-value" id="kpi-1">4.85</span>
+      <div class="kpi-label" id="kpi-label-1">Global CSAT Average</div>
+      <div class="kpi-subtext" id="kpi-sub-1">Elite customer satisfaction layer across macro-tier accounts.</div>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-value" id="kpi-2">0.21%</span>
+      <div class="kpi-label" id="kpi-label-2">SLO Breach Rate</div>
+      <div class="kpi-subtext" id="kpi-sub-2">Only 22 operational slips across 10,678 high-tier inflows.</div>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-value" id="kpi-3">121.1%</span>
+      <div class="kpi-label" id="kpi-label-3">Overall Productivity</div>
+      <div class="kpi-subtext" id="kpi-sub-3">Operating 21% beyond assigned target thresholds.</div>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-value" id="kpi-4">0.63%</span>
+      <div class="kpi-label" id="kpi-label-4">Escalation Rate</div>
+      <div class="kpi-subtext" id="kpi-sub-4">67 regional exceptions total. Exceptional edge risk filtering.</div>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-value" id="kpi-5">4.86</span>
+      <div class="kpi-label" id="kpi-label-5">Sev1 Critical CSAT</div>
+      <div class="kpi-subtext" id="kpi-sub-5">Peak performance captured during high-velocity system crises.</div>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-value" id="kpi-6">5.85</span>
+      <div class="kpi-label" id="kpi-label-6">Avg Days TTR</div>
+      <div class="kpi-subtext" id="kpi-sub-5">Competitive isolation loops across multi-variable data systems.</div>
+    </div>
+  </div>
+</section>
+
+<section id="crisis-sandbox">
+  <div class="section-label">Interactive Experience</div>
+  <div class="section-title">The Incident Command Sandbox</div>
+  <div class="section-desc">Test your situational decision leadership framework. Step directly into Anand’s shoes during the 17-Million Contact Sync Crisis.</div>
+
+  <div class="sim-container">
+    <h3 style="margin-bottom: 12px; color: #fff;">🚨 LIVE CRITICAL INCIDENT: Multi-Customer Database Drop Vector</h3>
+    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; line-height: 1.6;">
+      Telemetry signals report that an active filter configuration error is leading to critical database syncing anomalies for enterprise signatures. The blast radius threatens millions of rows. How do you structure immediate remediation steps?
+    </p>
+    <div style="display: grid; gap: 12px;">
+      <button class="sim-btn" onclick="triggerSimChoice(1)"><strong>Option A:</strong> Direct isolation scripts to drop multi-customer DB connections across nodes immediately.</button>
+      <button class="sim-btn" onclick="triggerSimChoice(2)"><strong>Option B:</strong> Establish an emergency incident bridge loop linking CIC, CSM units, and Backend Product Engineering.</button>
+      <button class="sim-btn" onclick="triggerSimChoice(3)"><strong>Option C:</strong> Issue an immediate wide-scale emergency email push to all 2,937 EMEA signature entities.</button>
+    </div>
+    <div id="sim-feedback-terminal" style="margin-top: 24px; padding: 16px; background: rgba(0,0,0,0.4); border-radius: 12px; display: none; border-left: 4px solid var(--sf-teal);">
+      <span style="font-family:'Fira Code', monospace; font-size: 0.85rem;" id="sim-feedback-text"></span>
+    </div>
+  </div>
+</section>
+
+<section id="timeline-journey">
+  <div class="section-label">Evolutionary Sequence</div>
+  <div class="section-title">The Salesforce Chronology</div>
+  <div class="section-desc">A 9-year evolutionary narrative tracking a progression from solo nighttime troubleshooting loops to high-level global organizational direction.</div>
+  
+  <div class="timeline">
+    <div class="timeline-item" data-rank="Core Solver" data-xp="15%">
+      <div class="timeline-dot">🌱</div>
+      <div class="timeline-year">JULY 2017</div>
+      <div class="timeline-title">The Entry Layer — Technical Support Engineer</div>
+      <div class="timeline-desc">Entered the Signature Success Marketing Cloud division in Hyderabad. Handled focused troubleshooting workflows containing a minimum baseline of 22-25 intricate diagnostic cases each month. Built core skills across Splunk diagnostics and multi-customer database safe-script procedures.</div>
+      <span class="tag tag-milestone">Milestone Placement</span>
+    </div>
+    
+    <div class="timeline-item" data-rank="Senior Firefighter" data-xp="40%">
+      <div class="timeline-dot">📈</div>
+      <div class="timeline-year">MID 2019</div>
+      <div class="timeline-title">Operational Deepening — Senior TSE Promotion</div>
+      <div class="timeline-desc">Assumed responsibilities for difficult customer handling and high-priority escalation routing. Transformed into an infrastructure specialist for the emerging PROM system tier and designed optimized GUS investigation procedures alongside CCE teams to solidify engineering handoff steps.</div>
+      <span class="tag tag-promotion">Promotion Track</span>
+    </div>
+    
+    <div class="timeline-item" data-rank="Incident Commander" data-xp="65%">
+      <div class="timeline-dot">🎖️</div>
+      <div class="timeline-year">EARLY 2021</div>
+      <div class="timeline-title">Architectural Command — Principal TSE Appointment</div>
+      <div class="timeline-desc">Commanded the high-stakes 17-Million Contact Sync Filter Crisis. Managed critical system bridging between the Customer Innovation Center, CSM units, and backend development pools, safeguarding millions of client files from a massive operational cascade.</div>
+      <span class="tag tag-promotion">Promotion Track</span>
+    </div>
+    
+    <div class="timeline-item" data-rank="Customer Hero" data-xp="80%">
+      <div class="timeline-dot">🚨</div>
+      <div class="timeline-year">FY 2024</div>
+      <div class="timeline-title">High-Visibility System Mitigations &amp; Peak Support Delivery</div>
+      <div class="timeline-desc">Earned elite global recognition during critical corporate deployments. Managed off-hours system stability for Telstra's large-scale regional deployment and intercepted complex data sync issues independently for GVC, ensuring seamless holiday coverage.</div>
+      <span class="tag tag-award">Top Performer Award</span>
+    </div>
+    
+    <div class="timeline-item" data-rank="Support Manager" data-xp="95%">
+      <div class="timeline-dot">👑</div>
+      <div class="timeline-year">FY 2025 - FY 2026</div>
+      <div class="timeline-title">Organizational Leadership — Support Manager Elevation</div>
+      <div class="timeline-desc">Assumed managerial direction for 8 elite engineers overseeing 2,937 regional accounts. Partnered directly with Nitish on a 3-month consecutive Sunday deployment campaign to preserve the $1.72M PVR INOX engagement. Championed defensive triage systems to protect multiple at-risk enterprise accounts.</div>
+      <span class="tag tag-leadership">Management Layer</span>
+    </div>
+
+    <div class="timeline-item" data-rank="Agentforce Legend" data-xp="100%">
+      <div class="timeline-dot">🚀</div>
+      <div class="timeline-year">CURRENT ERA (2026)</div>
+      <div class="timeline-title">The Automation Interface — AI Integration Leadership</div>
+      <div class="timeline-desc">Completed deep deployment steps within the Salesforce AI Design Lab. Engineered and distributed a production portfolio of 6 operational Slackbot skills globally, driving comprehensive system preparation for upcoming Marketing Cloud Next architectures.</div>
+      <span class="tag tag-milestone">AI Engineering Track</span>
+    </div>
+
+    <div class="timeline-item" data-rank="Ten-Year Veteran" data-xp="100%">
+      <div class="timeline-dot">✨</div>
+      <div class="timeline-year">JULY 2027</div>
+      <div class="timeline-title">The Horizon Limit — Ten-Year Milestone Countdown</div>
+      <div class="timeline-desc">Approaching a decade of engineering impact and system leadership within the Salesforce technology ecosystem.</div>
+      
+      <div class="countdown-box">
+        <div class="countdown-unit"><span class="countdown-number" id="cd-days">--</span><div class="countdown-label">Days</div></div>
+        <div class="countdown-unit"><span class="countdown-number" id="cd-hours">--</span><div class="countdown-label">Hours</div></div>
+        <div class="countdown-unit"><span class="countdown-number" id="cd-mins">--</span><div class="countdown-label">Minutes</div></div>
+        <div class="countdown-unit"><span class="countdown-number" id="cd-secs">--</span><div class="countdown-label">Seconds</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="account-management">
+  <div class="section-label">Enterprise Mitigation</div>
+  <div class="section-title">Critical Account Protection Shield</div>
+  <div class="section-desc">Active mitigation and architectural safety management across high-stakes global Red and Pre-Red accounts through coordinated cross-functional interventions.</div>
+  
+  <div class="cards-grid">
+    <div class="card">
+      <div>
+        <span class="card-icon">🏦</span>
+        <h3>Santander UK Plc</h3>
+        <p>Maintained high-tier support availability and system metrics across their signature enterprise cloud operations footprint.</p>
+      </div>
+      <div class="card-footer"><span class="card-tag">Signature Status</span></div>
+    </div>
+
+    <div class="card">
+      <div>
+        <span class="card-icon">🏬</span>
+        <h3>John Lewis Partnership</h3>
+        <p>Intercepted a critical Pre-Red account risk. Initiated same-day system evaluations, diagnosed processing bottlenecks inside automation workflows, and isolated data-extension scaling issues to restore complete platform health.</p>
+      </div>
+      <div class="card-footer"><span class="card-tag">Risk Interception</span></div>
+    </div>
+
+    <div class="card">
+      <div>
+        <span class="card-icon">🌿</span>
+        <h3>Laboratoires Yves Rocher</h3>
+        <p>Managed critical technical configurations to stop contract loss risks. Directed targeted resource loops to fix complex API connection blocks, safely opening a log of 256,205 system notifications without failures.</p>
+      </div>
+      <div class="card-footer"><span class="card-tag">Retention Secured</span></div>
+    </div>
+
+    <div class="card">
+      <div>
+        <span class="card-icon">🏨</span>
+        <h3>Accor SA</h3>
+        <p>Resolved persistent complex case escalations through focused operational triage sessions and direct architecture alignment alongside Senior CSM pools.</p>
+      </div>
+      <div class="card-footer"><span class="card-tag">Escalation Cleared</span></div>
+    </div>
+
+    <div class="card">
+      <div>
+        <span class="card-icon">📦</span>
+        <h3>Schwarz IT KG</h3>
+        <p>Managed advanced case isolation processes to systematically trace and resolve deep-tier infrastructure anomalies within their core communication pipelines.</p>
+      </div>
+      <div class="card-footer"><span class="card-tag">Active Resolution</span></div>
+    </div>
+
+    <div class="card">
+      <div>
+        <span class="card-icon">🚬</span>
+        <h3>Philip Morris International</h3>
+        <p>Received formal commendations from their CSM group for swift case closure speeds and high technical precision during complex environmental anomalies.</p>
+      </div>
+      <div class="card-footer"><span class="card-tag">System Stability</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="ai-infrastructure">
+  <div class="section-label">Innovation Pipeline</div>
+  <div class="section-title">AI Automation &amp; Slackbot Implementations</div>
+  <div class="section-desc">Engineered from scratch during the AI Design Lab framework and distributed globally across Director and VP branches to automate complex technical analysis. Click the tabs inside the interactive Slack repository below to view each script dynamically:</div>
+  
+  <div class="slack-console">
+    <div class="slack-tabs" id="slack-tabs-container">
+      <button class="slack-tab active" onclick="runSlackBot('health')">/canvas-health</button>
+      <button class="slack-tab" onclick="runSlackBot('coach')">/escalation-coach</button>
+      <button class="slack-tab" onclick="runSlackBot('sentiment')">/sentiment-risk</button>
+      <button class="slack-tab" onclick="runSlackBot('cert')">/cert-compliance</button>
+      <button class="slack-tab" onclick="runSlackBot('kcs')">/kcs-health</button>
+      <button class="slack-tab" onclick="runSlackBot('swarm')">/swarm-tracker</button>
+    </div>
+    <div class="slack-output" id="slack-terminal-output">
+      <span style="color:#4bca81;">★ amand-bot // verified-active</span><br><br>
+      <span style="color:#fff; font-weight:600;">[SKILL 1/6: Account Health & Sentiment Review]</span><br>
+      <span style="color:var(--sf-teal);">⚡ Functionality:</span> Pulls FY27 cases from OrgCS, AOV/ACV logs, CSM parameters, Red Account history, and open Slack trails. Delivers a complete, formatted account risk canvas matrix in under three minutes.<br>
+      <span style="color:var(--sf-gold);">🎯 Audience Impact:</span> Global support leadership blocks. Saves hours of complex text lookup and prep work for QBR and EBC planning cycles.
+    </div>
+  </div>
+</section>
+
+<section id="people-workforce">
+  <div class="section-label">Talent Engineering</div>
+  <div class="section-title">Workforce Transformation &amp; Up-Skilling Metrics</div>
+  <div class="section-desc">Drove structured capability up-skilling programs across the engineering tier, managing candidate screening panels and building team engagement trust.</div>
+  
+  <div class="kpi-grid">
+    <div class="kpi-card" style="border-color:var(--sf-purple);">
+      <span class="kpi-value" style="color:var(--sf-purple);">128</span>
+      <div class="kpi-label">Certifications Secured</div>
+      <div class="kpi-subtext">Total verified technical completions achieved by direct engineering pods.</div>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-value">99%</span>
+      <div class="kpi-label">Engagement Index</div>
+      <div class="kpi-subtext">Peak trust metrics verified through the corporate Insights Survey.</div>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-value">92%</span>
+      <div class="kpi-label">AI Readiness Layer</div>
+      <div class="kpi-subtext">Comprehensive shift preparation completed for new platform technologies.</div>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-value">100%</span>
+      <div class="kpi-label">Astro Alignment</div>
+      <div class="kpi-subtext">Total compliance across all required technical compliance pipelines.</div>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <h3 style="margin-bottom:16px; font-family:'Playfair Display', serif;">Strategic Certification Log</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Technical Credential Area</th>
+          <th>Verified Team Completions</th>
+          <th>Operational Mastery Field</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Data 360 Consultant</strong></td>
+          <td><strong>41 Engineers</strong></td>
+          <td>Enterprise Data Cloud ingestion and multi-point profile linking architecture.</td>
+        </tr>
+        <tr>
+          <td><strong>Platform Administrator</strong></td>
+          <td><strong>38 Engineers</strong></td>
+          <td>Core platform access privileges, system security layers, and general configuration.</td>
+        </tr>
+        <tr>
+          <td><strong>Certified Agentforce Specialist</strong></td>
+          <td><strong>20 Engineers</strong></td>
+          <td>Autonomous agent construction, reasoning configurations, and action tools.</td>
+        </tr>
+        <tr>
+          <td><strong>Marketing Cloud Developer (MCE)</strong></td>
+          <td><strong>9 Engineers</strong></td>
+          <td>Advanced dynamic script logic, system personalization, and API infrastructure.</td>
+        </tr>
+        <tr>
+          <td><strong>MCE Core Frameworks &amp; Consultants</strong></td>
+          <td><strong>15 Engineers</strong></td>
+          <td>Strategic message design, delivery protocols, and account grouping setups.</td>
+        </tr>
+        <tr>
+          <td><strong>Platform Administrator II</strong></td>
+          <td><strong>5 Engineers</strong></td>
+          <td>Advanced rule modeling, advanced automation loops, and scale diagnostics.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="peer-recognition">
+  <div class="section-label">Validation Loops</div>
+  <div class="section-title">Corporate Accolades &amp; Client Feedback</div>
+  <div class="section-desc">A log of verified communications from global system directors, customer success entities, and enterprise partners.</div>
+  
+  <div class="quote-wall">
+    <div class="quote-card">
+      <button class="copy-btn">📋 Copy</button>
+      <blockquote>"Always ready to jump on calls with customers and making sure team members are not taking the pressure. A great skill helping the team provide great customer experience!"</blockquote>
+      <div class="quote-author">— Ken O'Dwyer</div>
+      <div class="quote-context">Senior Director, Technical Support Engineering</div>
+    </div>
+
+    <div class="quote-card">
+      <button class="copy-btn">📋 Copy</button>
+      <blockquote>"Well done for all of your hard work over the weekend working on the critical GVC / Ladbrokes Coral Connector Synchronization issue... You executed perfectly, knew how to troubleshoot their custom solution, and deflected the call from reaching the EMEA Engineer On Call."</blockquote>
+      <div class="quote-author">— Duncan Mc Connell</div>
+      <div class="quote-context">EMEA Support Systems Operations</div>
+    </div>
+
+    <div class="quote-card">
+      <button class="copy-btn">📋 Copy</button>
+      <blockquote>"Thank you for all the help you have done from my Day1 in salesforce. I'm glad I have you as my mentor. Thanks for being there when I need help and all the training that you have given to enable me to work efficiently."</blockquote>
+      <div class="quote-author">— Poojitha Bolla</div>
+      <div class="quote-context">Technical Support Engineer Pod</div>
+    </div>
+
+    <div class="quote-card">
+      <button class="copy-btn">📋 Copy</button>
+      <blockquote>"Kudos to Anand Kumar B for his attention and follow up with this customer, where we were having a troublesome time to get their SSH implemented and the out of APAC hours follow up will have made this, the largest APAC MC rollout, feel very comforted."</blockquote>
+      <div class="quote-author">— Telstra Core Deployment Group</div>
+      <div class="quote-context">Enterprise Deployment Verification Log</div>
+    </div>
+
+    <div class="quote-card">
+      <button class="copy-btn">📋 Copy</button>
+      <blockquote>"Appreciate the immediate assistance provided for this case which helped for quick resolution... Thanks to Anand for his patience and support."</blockquote>
+      <div class="quote-author">— Commonwealth Bank of Australia</div>
+      <div class="quote-context">Support Survey Response</div>
+    </div>
+
+    <div class="quote-card">
+      <button class="copy-btn">📋 Copy</button>
+      <blockquote>"Thanks for your brilliant help over the phone... Your team excellently explained the issue and were able to simply explain what to do so this doesn't happen again in the future."</blockquote>
+      <div class="quote-author">— Sports Tours International (Lewis)</div>
+      <div class="quote-context">Reactive Resolution Feedback</div>
+    </div>
+  </div>
+</section>
+
+<section id="personal-letter">
+  <div class="section-label">Reflective Review</div>
+  <div class="section-title">A Letter to Salesforce</div>
+  
+  <div class="letter">
+    <p>Nine years ago, I walked into Salesforce as a <strong>Technical Support Engineer</strong>, armed with curiosity, a love for solving hard problems, and a genuine belief that great support could change the relationship between a company and its customers.</p>
+    <p>What I didn't expect was how much this journey would change me — how it would stretch my thinking, challenge my assumptions, and connect me with some of the most brilliant, caring, and driven people I've ever met.</p>
+    <p>From resolving my first Sev1 case alone at midnight, to leading a team of 8 engineers across EMEA's most strategic accounts — every step has been a privilege. The $1.72M renewals, the 4.85 CSAT, the Red Account recoveries — those numbers represent real people, real businesses, and real trust placed in us.</p>
+    <p>As I look forward to the decade mark in July 2027, I carry a simple belief: <strong>the best support leader is one who makes themselves unnecessary</strong> — by building a team so capable, so confident, and so customer-obsessed that excellence becomes the baseline, not the exception.</p>
+    <p>Thank you, Salesforce. For nine extraordinary years. For the growth, the opportunity, and the chance to do work that matters.</p>
+    
+    <div class="letter-sign">— Anand Kumar B</div>
+    <div style="font-size:.85rem; color:var(--text-muted); margin-top:8px; font-weight:600; text-transform:uppercase; letter-spacing:1px;">
+      Manager, Technical Support Engineering · June 2026
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+'use strict';
+
+// DYNAMIC VIEWS DATA FOR ARCHITECTURAL TOGGLE
+const metricsData = {
+  exec: {
+    m1: "4.85", label1: "Global CSAT Average", sub1: "Elite customer satisfaction layer across macro-tier accounts.",
+    m2: "0.21%", label2: "SLO Breach Rate", sub2: "Only 22 operational slips across 10,678 high-tier inflows.",
+    m3: "121.1%", label3: "Overall Productivity", sub3: "Operating 21% beyond assigned target thresholds.",
+    m4: "0.63%", label4: "Escalation Rate", sub4: "67 regional exceptions total. Exceptional edge risk filtering.",
+    m5: "4.86", label5: "Sev1 Critical CSAT", sub5: "Peak performance captured during high-velocity system crises.",
+    m6: "5.85", label6: "Avg Days TTR", sub6: "Competitive isolation loops across multi-variable data systems."
+  },
+  eng: {
+    m1: "89.6%", label1: "Team Swarm Adherence", sub1: "Percentage of critical case inflows driven through collaborative cross-triage.",
+    m2: "111.0%", label2: "Backlog Closure Index", sub2: "Closing significantly higher volume than regional inflow thresholds.",
+    m3: "85.6%", label3: "Scheduled Utilization", sub3: "Strong capacity discipline optimizing standard support allocations.",
+    m4: "90.1%", label4: "Productive Adherence", sub4: "Engineering presence metrics verified during core peak queues.",
+    m5: "99.6%", label5: "Schedule Completion", sub5: "Operational reliability signaling robust pipeline health.",
+    m6: "8.30%", label6: "Case Reopen Rate", sub6: "Firmly within global standards with ongoing automated monitoring loops."
+  }
+};
+
+function toggleMetricView(viewType) {
+  document.getElementById('btn-view-exec').classList.toggle('active', viewType === 'exec');
+  document.getElementById('btn-view-eng').classList.toggle('active', viewType === 'eng');
+  
+  const d = metricsData[viewType];
+  for(let i = 1; i <= 6; i++) {
+    const valEl = document.getElementById(`kpi-${i}`);
+    valEl.style.opacity = 0;
+    valEl.style.transform = "translateY(-10px)";
+    
+    setTimeout(() => {
+      valEl.textContent = d[`m${i}`];
+      document.getElementById(`kpi-label-${i}`).textContent = d[`label${i}`];
+      document.getElementById(`kpi-sub-${i}`).textContent = d[`sub${i}`];
+      
+      valEl.style.opacity = 1;
+      valEl.style.transform = "translateY(0)";
+    }, 200);
+  }
+}
+
+// SIMULATOR FUNCTION FOR SEV1 MATRIX
+function triggerSimChoice(choice) {
+  const terminal = document.getElementById('sim-feedback-terminal');
+  const txt = document.getElementById('sim-feedback-text');
+  terminal.style.display = "block";
+  
+  if (choice === 1) {
+    terminal.style.borderLeftColor = "var(--sf-red)";
+    txt.innerHTML = "<span style='color:var(--sf-red);'>[WARNING: ROUTING COLLISION]</span> Isolation scripts targeted at database abstraction levels without verification flags can result in data fragmentation. Adjust tactics.";
+  } else if (choice === 2) {
+    terminal.style.borderLeftColor = "var(--sf-green)";
+    txt.innerHTML = "<span style='color:var(--sf-green);'>[SUCCESS: RESPONSE CODE 200]</span> Correct. Initializing immediate stakeholder bridge connections across CIC, Customer Success Management, and Product Engineering isolates the threat matrix. This matches Anand's real-world strategy!";
+  } else {
+    terminal.style.borderLeftColor = "var(--sf-gold)";
+    txt.innerHTML = "<span style='color:var(--sf-gold);'>[ALERT: METRIC LAG]</span> Blasting mass warning alerts across all regional nodes before verification steps increases backlog load exponentially. Triage first.";
+  }
+}
+
+// FULL SLACKBOT TERMINAL CONSOLE CORE MAP FOR ALL 6 SKILLS
+const slackData = {
+  health: `<span>★ amand-bot // verified-active</span><br><br><span style='color:#fff; font-weight:600;'>[SKILL 1/6: Account Health & Sentiment Review]</span><br><span style='color:var(--sf-teal);'>⚡ Functionality:</span> Pulls FY27 cases from OrgCS, AOV/ACV data logs, CSM structural parameters, Red Account history trends, and open Slack communications trails. Delivers a complete, formatted risk landscape presentation canvas in minutes.<br><br><span style='color:var(--sf-gold);'>🎯 Audience Impact:</span> Tailored precisely for global support leaders. Eliminates hours of data aggregation ahead of crucial QBR and Executive Briefing Center (EBC) preparation cycles.`,
+  
+  coach: `<span>★ amand-bot // verified-active</span><br><br><span style='color:#fff; font-weight:600;'>[SKILL 2/6: Escalation Coach for Support Leaders]</span><br><span style='color:var(--sf-teal);'>⚡ Functionality:</span> Deeply parses escalated tickets to track customer close-loop status, structural system sentiment trends, and root cause factors. Automatically builds SBI+A coaching insights alongside distinct SMART team milestone objectives.<br><br><span style='color:var(--sf-gold);'>🎯 Audience Impact:</span> Replaces slow manual cross-hunting loops between deep data layers inside OrgCS, GUS, Org62, and historical Slack rooms.`,
+  
+  sentiment: `<span>★ amand-bot // verified-active</span><br><br><span style='color:#fff; font-weight:600;'>[SKILL 3/6: Negative Sentiment Cases Review]</span><br><span style='color:var(--sf-teal);'>⚡ Functionality:</span> Systematically reads active cases, user logs, and technical interaction histories. Automatically catches hidden customer frustration indicators to group problem tickets under High Risk 🔴 and Watch 🟡 indicators per team member.<br><br><span style='color:var(--sf-gold);'>🎯 Audience Impact:</span> Proactively flags edge-case friction points before accounts trigger formal engineering escalation paths.`,
+  
+  cert: `<span>★ amand-bot // verified-active</span><br><br><span style='color:#fff; font-weight:600;'>[SKILL 4/6: Certification Maintenance Due Alert]</span><br><span style='color:var(--sf-teal);'>⚡ Functionality:</span> Queries backend tracking systems for active team direct report profiles. Isolates engineers with approaching MaintenanceDue certification metrics and provides clean visual lists with clear acquisition logs.<br><br><span style='color:var(--sf-gold);'>🎯 Audience Impact:</span> Completely handles and eliminates certification compliance surprises or surprise operational drops across engineering pods.`,
+  
+  kcs: `<span>★ amand-bot // verified-active</span><br><br><span style='color:#fff; font-weight:600;'>[SKILL 5/6: Knowledge Health Check]</span><br><span style='color:var(--sf-teal);'>⚡ Functionality:</span> Automatically checks individual knowledge base parameters. Monitors real-time KA attachment rates, creation volumes, document updates, and active KCS Publisher criteria per engineer.<br><br><span style='color:var(--sf-gold);'>🎯 Audience Impact:</span> Drives strict, top-tier knowledge quality benchmarks and documentation discipline at a team-wide level.`,
+  
+  swarm: `<span>★ amand-bot // verified-active</span><br><br><span style='color:#fff; font-weight:600;'>[SKILL 6/6: Swarm Activity Tracker]</span><br><span style='color:var(--sf-teal);'>⚡ Functionality:</span> Aggregates individual team collaborative participation logs. Monitors precise numbers for active Swarm Requests initiated alongside mutual Assists provided, yielding automated monthly team assistance breakdown ratios.<br><br><span style='color:var(--sf-gold);'>🎯 Audience Impact:</span> Easily highlights positive cooperation loops and provides objective visibility into peer mentoring patterns.`
+};
+
+function runSlackBot(tabKey) {
+  const container = document.getElementById('slack-tabs-container');
+  container.querySelectorAll('.slack-tab').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  const out = document.getElementById('slack-terminal-output');
+  out.style.opacity = 0.3;
+  setTimeout(() => {
+    out.innerHTML = slackData[tabKey];
+    out.style.opacity = 1;
+  }, 150);
+}
+
+class ThemeManager {
+  constructor() {
+    this.btn = document.getElementById('theme-toggle');
+    this.state = localStorage.getItem('journey-theme') || 'dark';
+    document.documentElement.dataset.theme = this.state;
+    this.updateIcon();
+    this.btn.addEventListener('click', () => this.toggle());
+  }
+  toggle() {
+    this.state = this.state === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = this.state;
+    localStorage.setItem('journey-theme', this.state);
+    this.updateIcon();
+  }
+  updateIcon() {
+    this.btn.textContent = this.state === 'dark' ? '☀️' : '🌙';
+  }
+}
+
+class ScrollProgress {
+  constructor() {
+    this.bar = document.getElementById('progress-bar');
+    window.addEventListener('scroll', () => {
+      const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+      this.bar.style.width = (pct * 100) + '%';
+    }, { passive: true });
+  }
+}
+
+class StarField {
+  constructor() {
+    this.canvas = document.getElementById('stars-canvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.stars = [];
+    this.resize();
+    window.addEventListener('resize', () => this.resize());
+    this.animate();
+  }
+  resize() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+    this.stars = Array.from({ length: 150 }, () => ({
+      x: Math.random() * this.canvas.width,
+      y: Math.random() * this.canvas.height,
+      r: Math.random() * 1.3 + 0.3,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.004 + Math.random() * 0.008
+    }));
+  }
+  animate() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    const t = Date.now() / 1000;
+    this.stars.forEach(s => {
+      const alpha = 0.2 + 0.6 * Math.abs(Math.sin(t * s.speed * 8 + s.phase));
+      this.ctx.beginPath();
+      this.ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      this.ctx.fillStyle = `rgba(210, 235, 255, ${alpha.toFixed(2)})`;
+      this.ctx.fill();
+    });
+    requestAnimationFrame(() => this.animate());
+  }
+}
+
+class DotNav {
+  constructor() {
+    this.dots = document.querySelectorAll('.dot-nav-item');
+    this.sections = [...document.querySelectorAll('section[id]')];
+    this.dots.forEach(d => {
+      d.addEventListener('click', () => {
+        const el = document.getElementById(d.dataset.target);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+    window.addEventListener('scroll', () => this.update(), { passive: true });
+  }
+  update() {
+    const mid = window.scrollY + window.innerHeight / 2;
+    let active = this.sections[0];
+    this.sections.forEach(s => { if (s.offsetTop <= mid) active = s; });
+    this.dots.forEach(d => d.classList.toggle('active', d.dataset.target === active.id));
+  }
+}
+
+// GAMIFIED TRACKER INTERSECTION ENGINE
+class HUDTracker {
+  constructor() {
+    this.items = document.querySelectorAll('.timeline-item[data-rank]');
+    this.rankText = document.getElementById('hud-rank-text');
+    this.xpFill = document.getElementById('hud-xp-fill');
+    
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if(e.isIntersecting) {
+          this.rankText.textContent = e.target.dataset.rank;
+          this.xpFill.style.width = e.target.dataset.xp;
+        }
+      });
+    }, {threshold: 0.5, rootMargin: "-10% 0px -40% 0px"});
+    
+    this.items.forEach(el => obs.observe(el));
+  }
+}
+
+class CopyManager {
+  constructor() {
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const card = btn.closest('.quote-card');
+        const text = card.querySelector('blockquote').textContent.trim();
+        const author = card.querySelector('.quote-author').textContent.trim();
+        try {
+          await navigator.clipboard.writeText(`${text} ${author}`);
+          btn.textContent = '✓ Copied!';
+        } catch {
+          btn.textContent = '✓ Done';
+        }
+        setTimeout(() => { btn.textContent = '📋 Copy'; }, 2000);
+      });
+    });
+  }
+}
+
+class Countdown {
+  constructor() {
+    this.target = new Date('2027-07-04T00:00:00');
+    this.tick();
+    setInterval(() => this.tick(), 1000);
+  }
+  tick() {
+    const diff = this.target - Date.now();
+    if (diff <= 0) {
+      document.getElementById('cd-days').textContent = '🎉';
+      return;
+    }
+    document.getElementById('cd-days').textContent = Math.floor(diff / 86400000);
+    document.getElementById('cd-hours').textContent = Math.floor((diff % 86400000) / 3600000);
+    document.getElementById('cd-mins').textContent = Math.floor((diff % 3600000) / 60000);
+    document.getElementById('cd-secs').textContent = Math.floor((diff % 60000) / 1000);
+  }
+}
+
+class AvatarEasterEgg {
+  constructor() {
+    const av = document.getElementById('avatar-btn');
+    let clicks = 0;
+    av.addEventListener('click', () => {
+      clicks++;
+      this.burst(av);
+      if (clicks === 3) {
+        av.textContent = '🚀';
+        setTimeout(() => { av.textContent = 'A'; clicks = 0; }, 2500);
+      }
+    });
+  }
+  burst(el) {
+    const colors = ['#0070d2', '#ffb75d', '#00a1e0', '#4bca81', '#7b5ea7'];
+    const rect = el.getBoundingClientRect();
+    for (let i = 0; i < 16; i++) {
+      const p = document.createElement('div');
+      const angle = (i / 16) * 360;
+      const distance = 50 + Math.random() * 60;
+      Object.assign(p.style, {
+        position: 'fixed', width: '8px', height: '8px', borderRadius: '50%',
+        background: colors[i % colors.length],
+        left: (rect.left + rect.width / 2) + 'px', top: (rect.top + rect.height / 2) + 'px',
+        pointerEvents: 'none', zIndex: '9999'
+      });
+      document.body.appendChild(p);
+      p.animate([
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+        { transform: `translate(calc(-50% + ${Math.cos(angle * Math.PI / 180) * distance}px), calc(-50% + ${Math.sin(angle * Math.PI / 180) * distance}px)) scale(0)`, opacity: 0 }
+      ], { duration: 600, easing: 'ease-out', fill: 'forwards' }).finished.then(() => p.remove());
+    }
+  }
+}
+
+class ScrollAnimator {
+  constructor() {
+    const targets = document.querySelectorAll('.card, .timeline-item, .quote-card, .kpi-card, .table-wrapper, .sim-container, .slack-console');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.animate([
+            { opacity: 0, transform: 'translateY(20px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ], { duration: 600, easing: 'cubic-bezier(0.25, 1, 0.5, 1)', fill: 'forwards' });
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.05 });
+    targets.forEach(el => observer.observe(el));
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  new ThemeManager();
+  new ScrollProgress();
+  new StarField();
+  new DotNav();
+  new HUDTracker();
+  new CopyManager();
+  new Countdown();
+  new AvatarEasterEgg();
+  new ScrollAnimator();
+  console.log('🏁 Gamified Experience Portfolio Completely Deployed.');
+});
+</script>
+</body>
+</html>
